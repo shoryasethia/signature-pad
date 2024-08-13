@@ -13,35 +13,63 @@ let isDrawing = false;
 let lastX = 0;
 let lastY = 0;
 
-// Set pen color and line width
-ctx.strokeStyle = '#ffffff'; // White color for the signature
-ctx.lineWidth = 3; // Increase line width for better visibility
-ctx.lineCap = 'round'; // Smoothen line edges
+// Set pen color
+ctx.strokeStyle = '#000000'; // Set ink color to black
+ctx.lineWidth = 2;
 
-// Event handlers
-canvas.addEventListener('mousedown', (e) => {
+// Function to handle drawing
+function startDrawing(x, y) {
     isDrawing = true;
-    lastX = e.offsetX;
-    lastY = e.offsetY;
-});
+    lastX = x;
+    lastY = y;
+}
 
-canvas.addEventListener('mousemove', (e) => {
+function draw(x, y) {
     if (isDrawing) {
         ctx.beginPath();
         ctx.moveTo(lastX, lastY);
-        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.lineTo(x, y);
         ctx.stroke();
-        lastX = e.offsetX;
-        lastY = e.offsetY;
+        lastX = x;
+        lastY = y;
     }
+}
+
+function stopDrawing() {
+    isDrawing = false;
+}
+
+// Event handlers for desktop
+canvas.addEventListener('mousedown', (e) => {
+    startDrawing(e.offsetX, e.offsetY);
+});
+
+canvas.addEventListener('mousemove', (e) => {
+    draw(e.offsetX, e.offsetY);
 });
 
 canvas.addEventListener('mouseup', () => {
-    isDrawing = false;
+    stopDrawing();
 });
 
 canvas.addEventListener('mouseleave', () => {
-    isDrawing = false;
+    stopDrawing();
+});
+
+// Event handlers for touch devices
+canvas.addEventListener('touchstart', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    startDrawing(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+});
+
+canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault(); // Prevent scrolling while drawing
+    const rect = canvas.getBoundingClientRect();
+    draw(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+});
+
+canvas.addEventListener('touchend', () => {
+    stopDrawing();
 });
 
 // Clear button
@@ -61,32 +89,13 @@ saveButton.addEventListener('click', () => {
 savePdfButton.addEventListener('click', () => {
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p', 'mm', 'a4');
+    const imgData = canvas.toDataURL('image/png');
 
-    // Create a temporary canvas for converting signature color
-    const tempCanvas = document.createElement('canvas');
-    const tempCtx = tempCanvas.getContext('2d');
-    tempCanvas.width = canvas.width;
-    tempCanvas.height = canvas.height;
-
-    // Draw the signature on the temporary canvas
-    tempCtx.drawImage(canvas, 0, 0);
-
-    // Invert the colors of the signature
-    const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-    for (let i = 0; i < imageData.data.length; i += 4) {
-        // Invert the colors (white to black)
-        imageData.data[i] = 255 - imageData.data[i];      // Red
-        imageData.data[i + 1] = 255 - imageData.data[i + 1];  // Green
-        imageData.data[i + 2] = 255 - imageData.data[i + 2];  // Blue
-    }
-    tempCtx.putImageData(imageData, 0, 0);
-
-    // Convert the temporary canvas to image data
-    const imgData = tempCanvas.toDataURL('image/png');
-
-    // Add image to PDF
+    // Calculate the dimensions of the image in mm
     const imgWidth = 190;
     const imgHeight = canvas.height * imgWidth / canvas.width;
+
+    // Add image to PDF
     pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
     pdf.save('signature.pdf');
 });
