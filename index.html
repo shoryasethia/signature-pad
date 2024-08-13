@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signature Pad</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="overlay"></div>
+    <div class="container">
+        <h1>Signature Pad</h1>
+        <canvas id="signature-pad"></canvas>
+        <div class="button-group">
+            <button id="clear">Clear</button>
+            <button id="save">Save as PNG</button>
+            <button id="save-pdf">Save as PDF</button>
+        </div>
+    </div>
+    <footer>
+        <p>Made by <a href="https://github.com/shoryasethia" target="_blank">Shorya Sethia</a> | © 2024</p>
+    </footer>
+    <div class="dropdown">
+        <div class="dropbtn">
+            <div class="hamburger-icon">
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+            </div>
+        </div>
+        <div class="dropdown-content">
+            <a href="mailto:shoryasethia4may@gmail.com?subject=Report">Report</a>
+            <a href="mailto:shoryasethia4may@gmail.com?subject=Suggestion">Suggestions</a>
+            <a href="https://github.com/shoryasethia/signature-pad">Source Code</a>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</body>
+</html>
